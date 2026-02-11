@@ -1,0 +1,64 @@
+# Speech AI Pipeline – config
+# Copy to config.yaml and adjust as needed.
+# Connection (topic names, rates) is used when the LUCY adapter is run; the adapter is from lucy_ros_api.
+
+# --- Connection (for LUCY adapter; see lucy_ros_api docs) ---
+connection:
+  mic_topic: "/mic_audio"
+  playback_topic: "/audio"
+  say_action: "/say"
+  playback_rate: 48000
+  playback_channels: 1
+  playback_format: "float32"
+  playback_chunk_size: 1024
+
+# --- Pipeline ---
+pipeline:
+  # Input: mic is typically 48 kHz stereo int16; we resample to 16 kHz mono for Whisper
+  asr_sample_rate: 16000
+  asr_channels: 1
+  # VAD: silence duration (seconds) to consider end-of-utterance
+  vad_silence_duration: 0.8
+  # Optional: max segment length (seconds) before forcing ASR
+  max_utterance_seconds: 30.0
+
+# --- ASR (Whisper) ---
+asr:
+  # "openai_whisper" or "faster_whisper"
+  backend: "faster_whisper"
+  # Model: "tiny", "base", "small", "medium", "large-v3", etc. (faster-whisper: same names)
+  model_size: "small"
+  # Device: "cuda", "cpu", or "cuda:0"
+  device: "cuda"
+  # Language: null for auto-detect, or "en", "fr"
+  language: null
+  # Path to local model (optional; if set, overrides model_size)
+  # model_path: null
+
+# --- LLM ---
+llm:
+  # Model: "nemotron_flash_3b" or path to local model
+  model_name: "nvidia/Nemotron-Flash-3B"
+  device: "cuda"
+  max_new_tokens: 256
+  system_prompt: |
+    You are a friendly robot assistant named LUCY. Answer briefly in the same language the user used (English or French).
+  # Optional: local path
+  # model_path: null
+
+# --- TTS (Piper) ---
+tts:
+  # Piper ONNX voice paths (from rhasspy/piper-voices or local)
+  # Use EN and FR voices; key = language code
+  voices:
+    en: "voices/en_US-lessac-medium/en_US-lessac-medium.onnx"
+    fr: "voices/fr_FR-siwis-medium/fr_FR-siwis-medium.onnx"
+  # Piper sample rate (e.g. 22050); we resample to playback_rate for LUCY
+  sample_rate: 22050
+  # Device for ONNX: "CUDAExecutionProvider" or "CPUExecutionProvider"
+  provider: "CUDAExecutionProvider"
+
+# --- Paths (relative to repo root or absolute) ---
+paths:
+  # Directory containing Piper voice .onnx (and .onnx.json) files
+  piper_voices_dir: "voices"
