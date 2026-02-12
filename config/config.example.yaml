@@ -7,6 +7,8 @@ connection:
   mic_topic: "/mic_audio"
   playback_topic: "/audio"
   say_action: "/say"
+  # Mic sample rate: 16000 when using control-panel mic, 48000 when using robot audio_capturer.
+  mic_sample_rate: 16000
   playback_rate: 48000
   playback_channels: 1
   playback_format: "float32"
@@ -19,6 +21,8 @@ pipeline:
   asr_channels: 1
   # VAD: silence duration (seconds) to consider end-of-utterance
   vad_silence_duration: 0.8
+  # VAD: RMS above this = speech (lower for quiet mics e.g. control panel)
+  vad_energy_threshold: 0.01
   # Optional: max segment length (seconds) before forcing ASR
   max_utterance_seconds: 30.0
 
@@ -31,7 +35,9 @@ asr:
   # Device: "cuda", "cpu", or "cuda:0"
   device: "cuda"
   # Language: null for auto-detect, or "en", "fr"
-  language: null
+  language: "en"
+  # no_speech_threshold: Whisper default 0.6; lower (e.g. 0.4) accepts more as speech
+  no_speech_threshold: 0.6
   # Path to local model (optional; if set, overrides model_size)
   # model_path: null
 

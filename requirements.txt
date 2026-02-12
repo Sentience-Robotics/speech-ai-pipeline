@@ -15,3 +15,7 @@ piper-tts>=1.2.0
 onnxruntime>=1.16.0
 # Resampling (if not using torchaudio)
 # resampy>=0.4.2
+
+# Tests
+pytest>=7.0
+pytest-cov>=4.0
